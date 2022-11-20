@@ -87,7 +87,7 @@ router.get('/posts/:id/edit', async function (req, res) {
   const posts = await db
     .getDb()
     .collection('posts')
-    .findOne({ _id: new ObjectId(postId) }, {title:1, summary:1, body: 1});
+    .findOne({ _id: new ObjectId(postId) }, { title: 1, summary: 1, body: 1 });
 
   if (!posts) {
     return res.status(404).render('404');
@@ -98,18 +98,27 @@ router.get('/posts/:id/edit', async function (req, res) {
 
 router.post('/posts/:id/edit', async function (req, res) {
   const postId = new ObjectId(req.params.id);
- 
-  const result = await db.getDb().collection('posts').updateOne(
-    { _id: postId },
-    {
-      $set: {
-        title: req.body.title,
-        summary: req.body.summary,
-        body: req.body.content,
-      }
-    }
-  );
 
+  const result = await db
+    .getDb()
+    .collection('posts')
+    .updateOne(
+      { _id: postId },
+      {
+        $set: {
+          title: req.body.title,
+          summary: req.body.summary,
+          body: req.body.content,
+        },
+      }
+    );
+
+  res.redirect('/posts');
+});
+
+router.post('/posts/:id/delete', async function (req, res) {
+  const postId = new ObjectId(req.params.id);
+  await db.getDb().collection('posts').deleteOne({ _id: postId });
   res.redirect('/posts');
 });
 
