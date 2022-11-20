@@ -59,12 +59,22 @@ router.post('/posts', async function (req, res) {
   res.redirect('/posts');
 });
 
-router.get('/posts/:id', async function (req, res) {
-  const postId = req.params.id;
+router.get('/posts/:id', async function (req, res, next) {
+  let postId = req.params.id;
+
+  try {
+    // the middleware handling wont become active w/o this - the mongodb package 
+    // crashes before the default error handling it becayse of async function
+    postId = ObjectId(postId);
+  } catch (error) {
+    return res.status(404).render('404');
+    // return next(error); // ==> this moveon to the next error handling (the default 505)
+  }
+
   const post = await db
     .getDb()
     .collection('posts')
-    .findOne({ _id: new ObjectId(postId) }, { summary: 0 }); //summary will be exclude from query
+    .findOne({ _id: postId }, { summary: 0 }); //summary will be exclude from query
 
   if (!post) {
     return res.status(404).render('404');
