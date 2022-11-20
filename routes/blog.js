@@ -70,6 +70,15 @@ router.get('/posts/:id', async function (req, res) {
     return res.status(404).render('404');
   }
 
+  post.easyDate = post.date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  post.date = post.date.toISOString(); // gives a string version of the date
+
   res.render('post-detail', { post: post });
 });
 
